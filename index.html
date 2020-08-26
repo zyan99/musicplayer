@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="icon" href="./favicon.ico">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+    <link rel="stylesheet" href="./index.css">
+    <script>
+        // 禁止文本选中
+        window.onselectstart = function () { return false; }
+        window.ondragstart = function () { return false; }
+    </script>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <!-- 最外层盒子 -->
+        <div class="app_box">
+            <!-- 头部 -->
+            <div class="music_top">
+                <div class="music_top_left">soso音乐</div>
+                <div class="music_top_right">
+                    <input type="text" name="" id="" v-model="keywords" @keyup.enter="searchSongs">
+                </div>
+            </div>
+
+            <!-- content -->
+            <div class="music_content">
+                <div class="music_content_left">
+                    <div class="music_content_list">
+                        <div class="music_content_list_item" v-for="song,index in songs">
+                            <div @click="playAudio(song.id)" class="music_player"></div>
+                            <div class="music_name" @dblclick="playAudio(song.id)">{{song.name}}</div>
+                            <div :class="['music_mv',{hidden:song.mvid==0}]" @click="playMV(song.mvid)"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 旋转音乐磁盘 -->
+                <div class="music_content_middle">
+                    <img :class="['player_bar',{playing:isAudioPlaying?!isAudioRotate:isAudioPlaying}]"
+                        src="./imgs/player_bar.png" alt="">
+                    <img class="cover" :src="coverUrl==''?'./imgs/cover.jpg':coverUrl" alt="">
+                    <img :class="['disc',{autorotate:isAudioPlaying},{parserotate:isAudioRotate}]" src="./imgs/disc.png"
+                        alt="">
+                </div>
+                <!-- 精彩评论 -->
+                <div class="music_content_right">
+                    <h4>精彩评论</h4>
+                    <!-- 评论 -->
+                    <div class="music_comments_list">
+                        <div class="music_comments_list_item" v-for="comment,index in hotComments" :key="index">
+                            <div class="item_left">
+                                <img :src="comment.user.avatarUrl" alt="">
+                            </div>
+                            <div class="item_right">
+                                <div class="nickname">{{comment.user.nickname}}</div>
+                                <div class="text">{{comment.content}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- foot player -->
+            <div class="music_footer">
+                <!-- 音乐播放器 -->
+                <audio :src="musicUrl" ref="audio" @pause="audioPause" @play="audioPlay" controls autoplay loop></audio>
+                <!-- 视频播放器 -->
+                <div :class="['video_box',{hidden:!isVideoPlaying}]">
+                    <div class="mask"></div>
+                    <div class="video_close" @click="closeMV">x</div>
+                    <video :src="videoUrl" ref="video" controls autoplay loop></video>
+                </div>
+            </div>
+
+
+
+        </div>
+
+        <div :class="['loading',{hidden:!isLoading}]">
+            <img src="./imgs/loading.gif" alt="">
+        </div>
+    </div>
+
+
+
+
+
+</body>
+<script src="./js/vue.js"></script>
+<script src="./js/axios.min.js"></script>
+<script src="./js/common.js"></script>
+<script>
+    let app = new Vue({
+        el: '#app',
+        data: {
+            songs: [],//歌曲列表
+            keywords: "热门",//默认搜索热门歌曲
+            musicUrl: "",//音频播放地址
+            coverUrl: "",//图片地址
+            videoUrl: "",//MV地址
+            hotComments: [],//热门评论
+            isAudioPlaying: false,//音频播放的标志
+            isAudioRotate: false,//音频播放碟片旋转
+            isVideoPlaying: false,//视频
+            isLoading: true,
+        },
+        methods: {
+            searchSongs: function () {
+                // 搜索歌曲, 如果为空不允许搜索
+                if (!this.keywords) {
+                    alert("关键词不能为空!")
+                } else {
+                    Axios.get("/search", {
+                        params: {
+                            keywords: this.keywords
+                        }
+                    }).then((res) => {
+                        this.songs = res.result.songs
+                    })
+                }
+            },
+            // 播放
+            playAudio: function (id) {
+                this.isAudioPlaying = true;
+                Axios.get("/song/url", {
+                    params: {
+                        id: id
+                    }
+                }).then((res) => {
+                    // console.log(res);
+                    console.log(res.data[0].url);
+                    this.musicUrl = res.data[0].url;
+                })
+                // 获取歌曲详情
+                Axios.get("/song/detail", {
+                    params: {
+                        ids: id
+                    }
+                }).then((res) => {
+                    console.log(res)
+                    this.coverUrl = res.songs[0].al.picUrl;
+                })
+                // 获取热门评论内容
+                Axios.get("/comment/hot?type=0", {
+                    params: {
+                        id: id
+                    }
+                }).then((res) => {
+                    console.log(res);
+                    this.hotComments = res.hotComments;
+                })
+            },
+            // 暂停播放
+            audioPause: function () {
+                // 暂停时定格当前动画
+                // this.isAudioPlaying = false;
+                this.isAudioRotate = true;
+            },
+            // 继续播放
+            audioPlay: function () {
+                // 继续播放时从定格动画开始
+                // this.isAudioPlaying = true;
+                this.isAudioRotate = false;
+            },
+            // 播放MV
+            playMV: function (id) {
+                this.$refs.audio.pause();// 停止播放音乐
+                this.isAudioPlaying = false;
+                this.isVideoPlaying = true;// MV 播放了
+                Axios.get("/mv/url", {
+                    params: {
+                        id: id
+                    }
+                }).then((res) => {
+                    this.videoUrl = res.data.url;
+                })
+            },
+            // 关闭MV
+            closeMV: function () {
+                this.isVideoPlaying = false;
+                this.$refs.video.pause();
+                console.log(this.$refs)
+            }
+        },
+        // 挂载到 DOM元素上时
+        mounted() {
+            // 自动调用搜索
+            Axios.get("/search", {
+                params: {
+                    keywords: this.keywords
+                }
+            }).then((res) => {
+                this.songs = res.result.songs;
+                // 随机播放
+                let num = Math.floor(Math.random()*30)
+                console.log(num)
+                let id = this.songs[num].id;
+                this.isAudioPlaying = true;
+                console.log(id)
+                Axios.get("/song/url", {
+                    params: {
+                        id: id
+                    }
+                }).then((res) => {
+                    // console.log(res);
+                    console.log(res.data[0].url);
+                    this.musicUrl = res.data[0].url;
+                })
+                // 获取歌曲详情
+                Axios.get("/song/detail", {
+                    params: {
+                        ids: id
+                    }
+                }).then((res) => {
+                    console.log(res)
+                    this.coverUrl = res.songs[0].al.picUrl;
+                })
+                // 获取热门评论内容
+                Axios.get("/comment/hot?type=0", {
+                    params: {
+                        id: id
+                    }
+                }).then((res) => {
+                    console.log(res);
+                    this.hotComments = res.hotComments;
+                })
+            })
+        }
+    })
+</script>
+
+</html>

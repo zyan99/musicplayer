@@ -1,0 +1,299 @@
+#app {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background: url(./imgs/bg1.jpeg);
+    background-size: 100% 100%;
+    
+    .hidden{
+        display: none;
+    }
+    @keyframes running {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+    }
+    .app_box {
+        width: 800px;
+        height: 600px;
+        border: 1px solid #c62f2f;
+        border-radius: 10px;
+        .music_top {
+            width: 799px;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            height: 60px;
+            align-items: center;
+            padding: 5px;
+            background-color: #c62f2f;
+            border-radius: 10px 10px 0 0;
+            .music_top_left {
+                color: #fff;
+                margin-left: 10px;
+            }
+            .music_top_right {
+                input {
+                    width: 300px;
+                    height: 30px;
+                    border: none;
+                    border-radius: 25px;
+                    outline: none;
+                    text-indent: 15px;
+                    margin-right: 15px;
+                    background: url(imgs/zoom.png) 270px center no-repeat white;
+                }
+            }
+        }
+
+        .music_content {
+            position: relative;
+            height: 480px;
+            width: 799px;
+            display: flex;
+            // background-color: #fff;
+            // z-index: -2;
+            &::after{
+                content:'';
+                position:absolute;
+                top:0;
+                right:0;
+                bottom:0;
+                left:0;
+                z-index:-1;
+                background: initial;
+                filter:blur(50px);
+                background: url(./imgs/bg2.jpg) no-repeat;
+                background-size: 100% 100%;
+                -webkit-filter: blur(50px);
+            }
+            .music_content_left {
+                height: 100%;
+                width: 200px;
+                overflow-x: hidden;
+                overflow-y: scroll;
+                background-color: #fff;
+                .music_content_list {
+                    
+                    .music_content_list_item {
+                        height: 30px;
+                        display: flex;
+                        align-items: center;
+                        &:nth-child(odd){
+                            background-color: #F5F5F7;
+                        }
+                        &:hover{
+                            background-color: #EBECED;
+                        }
+                        background-color: #fff;
+                        .music_player {
+                            margin-left: 10px;
+                            width: 15px;
+                            height: 15px;
+                            background: url(imgs/table.png) -0 -19px;
+                            background-size: 65px;
+                            cursor: pointer;
+                            &:hover{
+                                background-position: -15.7px -19px;
+                            }
+                        }
+
+                        .music_name {
+                            width: 145px;
+                            height: 30px;
+                            line-height: 30px;
+                            font-size: 12px;
+                            text-align: center;
+                            color: #333333;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            cursor: default;
+                        }
+
+                        .music_mv {
+                            width: 30px;
+                            height: 20px;
+                            cursor: pointer;
+                            background: url(imgs/table.png) 0 -45px;
+                            &:hover{
+                                background-position: -30px -45px;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .music_content_middle {
+                width: 400px;
+                height: 100%;
+                position: relative;
+                background-color: rgba(255,255,255,0.5);
+                .player_bar {
+                    position: absolute;
+                    left: 200px;
+                    z-index: 8;
+                    transform-origin: 12px 12px;
+                    transform: rotate(-25deg);
+                    transition: all 2s;
+                }
+                .playing{
+                    transform: rotate(10deg) !important;
+                }
+                .cover{
+                    position: absolute;
+                    width: 150px;
+                    height: 150px;
+                    top: 156px;
+                    left: 156px;
+                }
+                .disc{
+                    position: absolute;
+                    top: 100px;
+                    left: 100px;
+                }
+                .autorotate{
+                    animation-name: running;
+                    animation-duration: 5s;
+                    animation-timing-function: linear;
+                    animation-iteration-count: infinite;
+                }
+                .parserotate{
+                    animation-play-state: paused;
+                }
+            }
+
+            .music_content_right {
+                width: 200px;
+                height: 100%;
+                overflow-x: hidden;
+                overflow-y: scroll;
+                background-color: rgba(255,255,255,0.8);
+                .music_comments_list {
+                    .music_comments_list_item {
+                        border-top: 1px solid #ccc;
+                        padding: 5px;
+                        display: flex;
+                        .item_left {
+                            padding: 5px;
+                            img {
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 50%;
+                            }
+                        }
+
+                        .item_right {
+                            .nickname {
+                                font-size: 14px;
+                                margin-top: 8px;
+                                color: rgb(12,115,194)
+                            }
+                            .text {
+                                font-size: 12px;
+                                padding-right: 5px;
+                                margin-top: 15px;
+                            }
+                        }
+                    }
+                }
+                h4{
+                    text-indent: 10px;
+                }
+            }
+        }
+        .music_footer {
+            width: 799px;
+            height: 59px;
+            background-color: #F2F3F4;
+            border-radius: 0 0 10px 10px;
+            audio {
+                width: 100%;
+                height: 100%;
+                outline: none;
+            }
+        
+            .video_box{
+                position: fixed;
+                top: 0px;
+                left: 0px;
+                width: 100vw;
+                height: 100vh;
+                z-index: 999;
+                .mask {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    background-color: black;
+                    width: 100%;
+                    height: 100%;
+                }
+        
+                .video_close {
+                    position: fixed;
+                    top: 10px;
+                    right: 20px;
+                    font-size: 30px;
+                    color: white;
+                    cursor: pointer;
+                }
+        
+                video {
+                    z-index: 999;
+                    background-color: #fff;
+                    position: fixed;
+                    transform: translate(-50%, -50%);
+                    top: 50%;
+                    left: 50%;
+                    width: 800px;
+                    height: 600px;
+                }
+            }
+        }
+
+    }
+
+    .loading {
+        position: fixed;
+        height: 100vh;
+        width: 100vw;
+        z-index: 2000;
+        img {
+            transform: translate(-50%,-50%);
+            position: fixed;
+            width: 200px;
+            height: 200px;
+            left: 50%;
+            top: 50%;
+            z-index: 3000;
+        }
+    }
+}
+
+
+// 滚动条整体部分
+div::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+// 滚动条的轨道
+div::-webkit-scrollbar-track {
+    background: rgb(239, 239, 239);
+    border-radius: 2px;
+}
+// 滚动条里的小方块
+div::-webkit-scrollbar-thumb {
+    background: #cfcfd1;
+    border-radius: 10px;
+}
+div::-webkit-scrollbar-thumb:hover {
+    background: #bfbfbf;
+}
+
+
